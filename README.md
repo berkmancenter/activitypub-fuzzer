@@ -2,6 +2,10 @@
 
 The ActivityPub Fuzzer is a small program to help developers build social media software on the Fediverse with the ActivityPub protocol. It uses data collected by the [Fediverse Schema Observatory](https://observatory.cyber.harvard.edu) to emulate known Fediverse software, solving the problem where developers have to manually test compatibility with dozens of other projects. The Fuzzer runs in a local development environment. You can tell it to locally emulate a public fire hose, or to send you messages formatted from every known version of a specific software project.
 
+For more information on how this federates, see `FEDERATION.md` in this repository.
+
+This codebase is AGPL 3.0 licensed (see `LICENSE.txt`). Dependencies distributed with this project (external and vendored) are AGPL compatible and should be consulted as needed.
+
 ## Requirements
 
  - Node.js v20 or later

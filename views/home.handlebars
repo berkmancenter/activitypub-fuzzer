@@ -168,8 +168,9 @@
       // Redirect to show-schema on schema selection
       schemaSelect.addEventListener('change', function() {
         const selectedHash = schemaSelect.value;
+        const rewriteAnnounceToCreate = document.getElementById('rewriteAnnounceToCreate').checked;
         if (selectedHash) {
-          window.location.href = `./show-schema?hash=${selectedHash}&rewriteAnnounceToCreate=true`;
+          window.location.href = `./show-schema?hash=${selectedHash}&rewriteAnnounceToCreate=${rewriteAnnounceToCreate}`;
         }
       });
 
@@ -269,6 +270,10 @@
   <h1>ActivityPub Fuzzer</h1>
   <div class="container">
     <p>This is a page where you can configure an ActivityPub fuzzer. This is an <a href="https://asml.cyber.harvard.edu">Applied Social Media Lab</a> project, featuring data from the <a href="https://observatory.cyber.harvard.edu">Fediverse Schema Observatory</a>.</p>
+    <label>
+      <input type="checkbox" id="rewriteAnnounceToCreate" checked>
+      Rewrite Announce to Create (recommended)
+    </label>
     <details class="section group">
       <summary>Target Inbox Settings</summary>
       <div>
@@ -300,10 +305,6 @@
             </select>
           </div>
           <div style="flex: 1; margin-left: 10px;">
-            <label>
-              <input type="checkbox" id="rewriteAnnounceToCreate" checked>
-              Rewrite Announce to Create (recommended)
-            </label>
             <label for="postCount">Number of schemas to POST:</label>
             <input type="number" id="postCount" name="postCount" min="1" value="1" style="width: 100%;">
             <div style="text-align: left;">

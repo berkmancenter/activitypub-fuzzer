@@ -85,6 +85,10 @@ At this point, the Fuzzer is running and you can:
  - use the web interface to send messages from a mocked public fire hose of all known Fediverse software to your target inbox. This is a great way to test how well your software handles a wide variety of ActivityPub messages. The fire hose is statistically distributed to be similar to what you'd see on a public fire hose -- for example, there will be more Mastodon Create(Note) activities than Pleroma Create(Note) activities, because Mastodon messages comprise a larger share of the Fediverse.
  - use the web interface to send a specific schema to a target inbox to test how your software handles that schema
 
+### Note on "Rewrite Announce to Create"
+
+There is a checkbox in the Fuzzer called "Rewrite Announce to Create". This is because the Fuzzer only currently supports `Create` activities, but there are lots of good Objects in the Observatory data set that are wrapped in `Announce` due to the Observatory collecting data from relays. If you check this box, any `Announce` activities sent by the Fuzzer will be rewritten as `Create` activities with the same object and should be similar to directly following an account from a service and getting the `Create` instead of the `Announce`.
+
 ### Features to come
 
 There is a [Github Project](https://github.com/orgs/berkmancenter/projects/12) to track future work on the Fuzzer.

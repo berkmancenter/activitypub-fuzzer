@@ -1,0 +1,355 @@
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ActivityPub Fuzzer</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 20px;
+      background-color: #f4f4f9;
+      color: #333;
+    }
+    .flame-effect {
+      animation: flame 1s infinite alternate;
+    }
+
+    form > * {
+      display: inline-block;
+      margin-right: 8px;
+    }
+
+    @keyframes flame {
+      0% {
+        box-shadow: 0 0 10px rgba(255, 69, 0, 0.5), 0 0 20px rgba(255, 140, 0, 0.5);
+      }
+      100% {
+        box-shadow: 0 0 20px rgba(255, 69, 0, 0.8), 0 0 30px rgba(255, 140, 0, 0.8);
+      }
+    }
+    h1 {
+      color: #4a90e2;
+      text-align: center;
+    }
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      background-color: #fff;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+    .section {
+      margin-bottom: 20px;
+    }
+    label {
+      font-weight: bold;
+    }
+    input[type="text"], input[type="number"], select {
+      width: 100%;
+      max-width: 300px;
+      padding: 8px;
+      margin-top: 5px;
+      margin-bottom: 10px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+    button {
+      padding: 10px 15px;
+      background-color: #4a90e2;
+      color: #fff;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #357ab8;
+    }
+    .schemas-posted {
+      margin-left: 20px;
+      margin-top: 16px;
+    }
+    pre {
+      font-size: 1.3em;
+      background-color: #f0f0f0;
+      padding: 10px;
+      border-radius: 5px;
+      overflow-x: auto;
+    }
+    .group {
+      margin-bottom: 20px;
+      background-color: #f9f9f9;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+    }
+    details {
+      padding: 0 0 0 16px;
+    }
+    details summary {
+      cursor: pointer;
+    }
+    summary {
+      padding: 16px;
+      margin-left: -16px;
+    }
+  </style>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.5.1/styles/default.min.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.5.1/highlight.min.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      hljs.highlightAll();
+
+      // Function to build query string
+      function buildQueryString(params) {
+        const queryString = Object.keys(params)
+          .map(key => `${encodeURIComponent(key)}=${encodeURIComponent(params[key])}`)
+          .join('&');
+        return queryString ? '?' + queryString : '';
+      }
+
+      // Function to get URL parameters
+      function getUrlParameter(name) {
+        name = name.replace(/[\[]/, '\\[').replace(/[\]]/, '\\]');
+        const regex = new RegExp('[\\?&]' + name + '=([^&#]*)');
+        const results = regex.exec(location.search);
+        return results === null ? '' : decodeURIComponent(results[1].replace(/\+/g, ' '));
+      }
+
+      // Populate software options
+      fetch('/unique-software')
+        .then(response => response.json())
+        .then(softwareList => {
+          const softwareSelect = document.getElementById('softwareSelect');
+          softwareList.sort((a, b) => {
+            if (!a) return 1;
+            if (!b) return -1;
+            return a.toLowerCase().localeCompare(b.toLowerCase());
+          }).forEach(software => {
+            const option = document.createElement('option');
+            option.value = software;
+            option.textContent = software;
+            // temp hack for fediforum
+            if (!option.textContent.includes('INSTANCE')) {
+              softwareSelect.appendChild(option);
+            }
+          });
+        })
+        .catch(error => console.error('Error fetching software list:', error));
+
+      // Schema search functionality
+      const schemaSearch = document.getElementById('schemaSearch');
+      const schemaSelect = document.getElementById('schemaSelect');
+
+      schemaSearch.addEventListener('input', function() {
+        const filter = schemaSearch.value.toLowerCase();
+        const filterValues = filter.split(' ').filter(value => value.trim() !== '');
+        const options = schemaSelect.options;
+
+        for (let i = 0; i < options.length; i++) {
+          const optionText = options[i].textContent.toLowerCase();
+          const matchesAll = filterValues.every(value => optionText.includes(value));
+          options[i].style.display = matchesAll ? '' : 'none';
+        }
+      });
+
+      // Populate schema options
+      fetch('/schemas-with-notes')
+        .then(response => response.json())
+        .then(schemas => {
+          schemas.forEach(schema => {
+            const option = document.createElement('option');
+            option.value = schema.hash;
+            option.textContent = schema.displayName;
+            schemaSelect.appendChild(option);
+          });
+        })
+        .catch(error => console.error('Error fetching schemas with notes:', error));
+
+      // Redirect to show-schema on schema selection
+      schemaSelect.addEventListener('change', function() {
+        const selectedHash = schemaSelect.value;
+        if (selectedHash) {
+          window.location.href = `./show-schema?hash=${selectedHash}`;
+        }
+      });
+
+      // Handle random schema posting
+      const postRandomSchemasButton = document.getElementById('postRandomSchemasButton');
+      const postCountInput = document.getElementById('postCount');
+      const schemasPostedDiv = document.getElementById('schemas-posted');
+
+      postRandomSchemasButton.addEventListener('click', async () => {
+        schemasPostedDiv.innerHTML = ''; // Clear the div before posting new schemas
+        const postCount = parseInt(postCountInput.value, 10);
+        if (isNaN(postCount) || postCount < 1) {
+          alert('Please enter a valid number of schemas to post.');
+          return;
+        }
+
+        for (let i = 0; i < postCount; i++) {
+          try {
+            const softwareSelect = document.getElementById('softwareSelect');
+            const selectedSoftware = softwareSelect.value;
+            const response = await fetch(`/random-schema-json?types=Create,Announce&notesOnly=false&software=${selectedSoftware}`);
+            const schemaData = await response.json();
+            const schemaHash = schemaData.hash;
+            const result = await fetch('/post-to-endpoint', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json'
+              },
+              body: JSON.stringify({ schema: schemaData.schema })
+            });
+            const postedMessage = await result.json();
+            const guid = postedMessage.guid;
+            const parsedJSON = JSON.parse(schemaData.schema);
+            const schemaType = parsedJSON.type;
+            const schemaObjectType = parsedJSON.object && parsedJSON.object.type;
+            let title;
+            if (decodeURIComponent(schemaData.notes) === 'null') {
+              title = `${schemaData.software} ${schemaType}(${schemaObjectType})`;
+            } else {
+              title = decodeURIComponent(schemaData.notes);
+            }
+            schemasPostedDiv.innerHTML += `<li><a href="https://activityfuzz.ngrok.dev/m/${guid}" target="_">${title}</a> <a href="https://observatory.cyber.harvard.edu/?hashLeft=${schemaHash}&hashRight=${schemaHash}">(FSO link)</a></li>`;
+          } catch (error) {
+            console.error('Error posting random schema:', error);
+          }
+        }
+        schemasPostedDiv.innerHTML += `<p><strong>${postCount} random schemas posted successfully.</strong></p>`;
+      });
+
+      // Clear posted schemas
+      const clearSchemasPostedButton = document.getElementById('clearSchemasPostedButton');
+      clearSchemasPostedButton.addEventListener('click', () => {
+        schemasPostedDiv.innerHTML = ''; // Clear the contents of the div
+      });
+      
+      // Handle Start Firehose button click
+      const startFirehoseButton = document.getElementById('startFirehoseButton');
+      if (startFirehoseButton) {
+        startFirehoseButton.addEventListener('click', function() {
+          const delayInput = document.getElementById('firehoseDelay');
+          const delay = delayInput ? delayInput.value : 1000; // Default to 1000ms if not found
+          fetch(`/firehose/start?delay=${delay}`)
+            .then(response => response.text())
+            .then(data => {
+              console.log(data);
+              console.log('Firehose started.');
+              const firehoseDetails = document.getElementById('firehose');
+              if (firehoseDetails) {
+                firehoseDetails.classList.add('flame-effect');
+              }
+            })
+            .catch(error => console.error('Error starting firehose:', error));
+        });
+      }
+      const stopFirehoseButton = document.getElementById('stopFirehoseButton');
+      if (stopFirehoseButton) {
+        stopFirehoseButton.addEventListener('click', function() {
+          fetch('/firehose/stop')
+            .then(response => response.text())
+            .then(data => {
+              console.log(data);
+              console.log('Firehose stopped.');
+              const firehoseDetails = document.getElementById('firehose');
+              if (firehoseDetails) {
+                firehoseDetails.classList.remove('flame-effect');
+              }
+            })
+            .catch(error => console.error('Error stopping firehose:', error));
+        });
+      }
+    });
+  </script>
+</head>
+<body>
+  <h1>ActivityPub Fuzzer</h1>
+  <div class="container">
+    <p>This is a page where you can configure an ActivityPub fuzzer. This is an <a href="https://asml.cyber.harvard.edu">Applied Social Media Lab</a> project, featuring data from the <a href="https://observatory.cyber.harvard.edu">Fediverse Schema Observatory</a>.</p>
+    <details class="section group">
+      <summary>Target Inbox Settings</summary>
+      <div>
+        <p><strong>Target inbox:</strong> {{targetEndpoint}}</p>
+
+        <form action="/set-target" method="POST">
+          <label for="targetEndpoint">Set Target inbox:</label>
+          <input type="text" id="targetEndpoint" name="targetEndpoint" required>
+          <button type="submit">Submit</button>
+        </form>
+      </div>
+      <div>
+        <form action="/sendFollow" method="POST">
+          <p>Send a <a href="https://www.w3.org/TR/activitystreams-vocabulary/#dfn-follow">generic Follow request</a> to target inbox</p>
+          <button type="submit">Send</button>
+        </form>
+      </div>
+    </details>
+
+    <details id="random-schemas" class="section group">
+      <summary>Send Random Schemas</summary>
+      <p>Here you can send random schemas from a software project of your choice to the target inbox defined above.</p>
+      <div class="section">
+        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px;">
+          <div style="flex: 1; margin-right: 10px; margin-top: 16px">
+            <label for="softwareSelect">Select Software:</label>
+            <select id="softwareSelect" name="softwareSelect" style="width: 100%;">
+              <!-- Options will be populated by JavaScript -->
+            </select>
+          </div>
+          <div style="flex: 1; margin-left: 10px;">
+            <label for="postCount">Number of schemas to POST:</label>
+            <input type="number" id="postCount" name="postCount" min="1" value="1" style="width: 100%;">
+            <div style="text-align: left;">
+              <button id="postRandomSchemasButton">POST random schemas</button>
+              <button id="clearSchemasPostedButton">Clear</button>
+            </div>
+          </div>
+        </div>
+        <ul id="schemas-posted" class="schemas-posted" style="margin-top: 10px;"></ul>
+      </div>
+    </details>
+
+    <details id="firehose" class="section group">
+      <summary>Emulate Fediverse Firehose</summary>
+      <div class="section">
+        <label for="firehoseDelay">Delay between messages (ms):</label>
+        <input type="number" id="firehoseDelay" name="firehoseDelay" min="0" value="1000" style="width: 100%;">
+        <div style="text-align: left; margin-top: 10px;">
+          <button id="startFirehoseButton">Start Firehose</button>
+          <button id="stopFirehoseButton">Stop Firehose</button>
+        </div>
+      </div>
+    </details>
+
+    <div class="section" id="view-schema">
+      <p>Enter the Fediverse Schema Observatory hash of a schema to display it here, or select from a list of named schemas on the Observatory.</p>
+      <form action="/show-schema" method="GET">
+        <label for="hash">Hash:</label>
+        <input type="text" id="hash" name="hash" required>
+        <button type="submit">Show me this schema</button>
+      </form>
+      <form id="schemaSelectForm">
+        <label for="schemaSelect">Select Schema:</label>
+        <select id="schemaSelect" name="schemaSelect">
+          <option value="" selected>Select a schema</option>
+          <!-- Options will be populated by JavaScript -->
+        </select>
+        <input type="text" id="schemaSearch" placeholder="Type to filter list...">
+      </form>
+    </div>
+
+    {{#if randomSchema}}
+      <div class="section">
+        <h2>Schema</h2>
+        <form action="/post-to-endpoint" method="POST">
+          <input type="hidden" name="schema" value="{{randomSchema.schema}}">
+          <button type="submit">POST to Inbox</button>
+        </form>
+        <p><strong>Hash:</strong> {{randomSchema.hash}}</p>
+        <p><strong>Title:</strong> {{decodeURI randomSchema.notes}}</p>
+        <pre><code class="json">{{{randomSchema.schema}}}</code></pre>
+      </div>
+    {{/if}}
+  </div>
+</body>

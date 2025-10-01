@@ -1,0 +1,5 @@
+.aider*
+node_modules/
+*.db
+.env
+coverage/

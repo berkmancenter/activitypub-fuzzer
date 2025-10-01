@@ -70,7 +70,7 @@ function replaceNullWithNull(schema) {
   return schema.replace(/"<null>"/g, 'null');
 }
 
-export default async function mockAndFormat(schema, notes, software, app) {
+export default async function mockAndFormat(schema, notes, software, app, rewriteAnnounceToCreate) {
   const parsedSchema = parseJSON(schema);
   const guid = crypto.randomBytes(16).toString('hex');
   const { DOMAIN: domain, ACCOUNT: account } = app.get('config');
@@ -79,7 +79,6 @@ export default async function mockAndFormat(schema, notes, software, app) {
   if (notes === 'null') {
     parsedNotes = `${parsedSchema.type}(${parsedSchema.object?.type}) from ${software || 'unknown software'}`;
   }
-
   // replace the Activity id with the GUID
   parsedSchema.id = parsedSchema.id.replace(/<uri>/g, () => `https://${domain}/m/${guid}/activity`);
   // replace the `actor` with the url for the actor
@@ -113,6 +112,10 @@ export default async function mockAndFormat(schema, notes, software, app) {
 
   // TODO: in the case of Announce, make it so there's a third party account that is attributed for the announce
   // (simply rewriting $.object.attributedTo with a dereferenceable mock actor isn't sufficient for some reason)
+  // For now, we rewrite Announce to Create if rewriteAnnounceToCreate is true
+  if (rewriteAnnounceToCreate && parsedSchema.type === 'Announce') {
+    parsedSchema.type = 'Create';
+  }
 
   // replace all url values within the array in parsedSchema.object.attachments with a mocked image
   if (parsedSchema.object.attachment && parsedSchema.object.attachment.forEach) {

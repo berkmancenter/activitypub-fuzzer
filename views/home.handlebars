@@ -169,7 +169,7 @@
       schemaSelect.addEventListener('change', function() {
         const selectedHash = schemaSelect.value;
         if (selectedHash) {
-          window.location.href = `./show-schema?hash=${selectedHash}`;
+          window.location.href = `./show-schema?hash=${selectedHash}&rewriteAnnounceToCreate=true`;
         }
       });
 
@@ -190,7 +190,7 @@
           try {
             const softwareSelect = document.getElementById('softwareSelect');
             const selectedSoftware = softwareSelect.value;
-            const response = await fetch(`/random-schema-json?types=Create,Announce&notesOnly=false&software=${selectedSoftware}`);
+            const response = await fetch(`/random-schema-json?types=Create,Announce&notesOnly=false&software=${selectedSoftware}&rewriteAnnounceToCreate=true`);
             const schemaData = await response.json();
             const schemaHash = schemaData.hash;
             const result = await fetch('/post-to-endpoint', {
@@ -231,7 +231,7 @@
         startFirehoseButton.addEventListener('click', function() {
           const delayInput = document.getElementById('firehoseDelay');
           const delay = delayInput ? delayInput.value : 1000; // Default to 1000ms if not found
-          fetch(`/firehose/start?delay=${delay}`)
+          fetch(`/firehose/start?delay=${delay}&rewriteAnnounceToCreate=true`)
             .then(response => response.text())
             .then(data => {
               console.log(data);

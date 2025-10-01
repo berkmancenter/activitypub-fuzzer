@@ -156,6 +156,7 @@ async function signAndSend(message, target = targetEndpoint) {
     });
 
     console.log(`Sent message to an inbox at ${target}!`);
+    console.log('Message id:', parsedJSON.id);
     console.log('Response Status Code:', response.status);
     console.log('Response body:', data);
     return guid;
@@ -285,13 +286,14 @@ app.post('/post-to-endpoint', async function (req, res) {
   }
 
   const guid = await signAndSend(schema);
-  console.log('Posted message', guid);
   return res.status(200).json({ guid });
 });
 
 app.post('/sendFollow', express.urlencoded({ extended: false }), async function (req, res) {
   const url = targetEndpoint;
   const followMessage = await createFollowMessage(url);
+  console.log('sending follow to inbox:', url);
+  console.log('follow message:', followMessage);
   signAndSend(JSON.stringify(followMessage), url);
 
   return res.send(`sending follow to ${url}`);
@@ -336,6 +338,8 @@ app.get('/firehose/start', (req, res) => {
     return res.status(400).send('Invalid delay parameter. It must be a positive integer.');
   }
 
+  const rewriteAnnounceToCreate = req.query.rewriteAnnounceToCreate === 'true';
+
   if (firehoseInterval) {
     clearInterval(firehoseInterval);
   }
@@ -344,7 +348,7 @@ app.get('/firehose/start', (req, res) => {
     try {
       const row = await randomSchemaDistributed();
       console.log('Random schema selected:', row.hash, row.total, row.software);
-      const formattedSchema = await mockAndFormat(row.schema, decodeURIComponent(row.notes), row.software, app);
+      const formattedSchema = await mockAndFormat(row.schema, decodeURIComponent(row.notes), row.software, app, rewriteAnnounceToCreate);
       const response = await fetch(`http://localhost:${port}/post-to-endpoint`, {
         method: 'POST',
         headers: {
@@ -429,6 +433,7 @@ app.get('/distinct-types', (req, res) => {
 
 app.get('/random-schema-json', async (req, res) => {
   const { types, notesOnly, software } = req.query;
+  const rewriteAnnounceToCreate = req.query.rewriteAnnounceToCreate === 'true';
   const notesOnlyBoolean = notesOnly === 'true';
   const typeList = types ? types.split(',') : [];
   const query =
@@ -442,7 +447,7 @@ app.get('/random-schema-json', async (req, res) => {
     } else if (!row) {
       res.status(500).json({ error: 'Internal Server Error' });
     } else {
-      const formattedSchema = await mockAndFormat(row.schema, decodeURIComponent(row.notes), row.software, app);
+      const formattedSchema = await mockAndFormat(row.schema, decodeURIComponent(row.notes), row.software, app, rewriteAnnounceToCreate);
       res.json({ ...row, schema: formattedSchema });
     }
   });
@@ -450,6 +455,7 @@ app.get('/random-schema-json', async (req, res) => {
 
 app.get('/random-schema', async (req, res) => {
   const { types, notesOnly } = req.query;
+  const rewriteAnnounceToCreate = req.query.rewriteAnnounceToCreate === 'true';
   const notesOnlyBoolean = notesOnly === 'true';
   const typeList = types ? types.split(',') : [];
   const query =
@@ -461,7 +467,7 @@ app.get('/random-schema', async (req, res) => {
       console.error('Error querying database:', err.message);
       res.status(500).send('Internal Server Error');
     } else {
-      const formattedSchema = await mockAndFormat(row.schema, decodeURIComponent(row.notes), row.software, app);
+      const formattedSchema = await mockAndFormat(row.schema, decodeURIComponent(row.notes), row.software, app, rewriteAnnounceToCreate);
       res.render('home', { totalSum: 0, targetEndpoint, randomSchema: { ...row, schema: formattedSchema } }); // Pass formattedSchema to the template
     }
   });
@@ -469,6 +475,7 @@ app.get('/random-schema', async (req, res) => {
 
 app.get('/show-schema', async (req, res) => {
   const { hash } = req.query;
+  const rewriteAnnounceToCreate = req.query.rewriteAnnounceToCreate === 'true';
   if (!hash) {
     return res.status(400).send('Hash is required.');
   }
@@ -484,7 +491,7 @@ app.get('/show-schema', async (req, res) => {
     }
 
     // Format the schema as pretty-printed JSON
-    const formattedSchema = await mockAndFormat(row.schema, decodeURIComponent(row.notes), row.software, app);
+    const formattedSchema = await mockAndFormat(row.schema, decodeURIComponent(row.notes), row.software, app, rewriteAnnounceToCreate);
     return res.render('home', { totalSum: 0, targetEndpoint, randomSchema: { ...row, schema: formattedSchema } }); // Pass formattedSchema to the template
   });
 });

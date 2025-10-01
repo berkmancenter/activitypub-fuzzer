@@ -191,7 +191,7 @@ async function createFollowMessage(target) {
   const guid = crypto.randomBytes(16).toString('hex');
   const followMessage = {
     '@context': 'https://www.w3.org/ns/activitystreams',
-    id: guid,
+    id: `https://${domain}/m/${guid}`,
     type: 'Follow',
     actor: `https://${domain}/u/${account}`,
     object: target || 'https://www.w3.org/ns/activitystreams#Public',

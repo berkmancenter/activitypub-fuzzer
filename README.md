@@ -73,7 +73,7 @@ Actor ID: https://fuzzer.example/u/fuzz
 Webfinger uri: https://fuzzer.example/.well-known/webfinger?resource=acct:fuzz@fuzzer.example
 ```
 
-If you go to whatever URL your tunneling service provided (e.g. `https://abcd1234.ngrok.io`), you should see the Fuzzer website, and if you go to the two URLs printed above, you should see the ActivityPub actor JSON and the webfinger JSON.
+If you go to whatever URL your tunneling service provided (e.g. `https://abcd1234.ngrok.io`), you should see the Fuzzer website, and if you go to the two URLs printed in the "Actor ID" and "Webfinger uri" log messages, you should see the ActivityPub actor JSON and the webfinger JSON.
 
 ### Using the Fuzzer
 

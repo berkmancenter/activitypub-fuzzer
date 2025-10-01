@@ -345,7 +345,7 @@ app.get('/firehose/start', (req, res) => {
       const row = await randomSchemaDistributed();
       console.log('Random schema selected:', row.hash, row.total, row.software);
       const formattedSchema = await mockAndFormat(row.schema, decodeURIComponent(row.notes), row.software, app);
-      const response = await fetch('http://localhost:3010/post-to-endpoint', {
+      const response = await fetch(`http://localhost:${port}/post-to-endpoint`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

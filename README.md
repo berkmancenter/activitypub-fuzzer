@@ -76,9 +76,11 @@ At this point, the Fuzzer is running and you can:
  - set the Fuzzer's target inbox URL to whatever you want, probably the inbox of an account on your own server you're developing and would like to test against mocked data
  - use the web interface to send messages from every known version of a specific Fediverse software project to your target inbox
  - use the web interface to send messages from a mocked public fire hose of all known Fediverse software to your target inbox. This is a great way to test how well your software handles a wide variety of ActivityPub messages. The fire hose is statistically distributed to be similar to what you'd see on a public fire hose -- for example, there will be more Mastodon Create(Note) activities than Pleroma Create(Note) activities, because Mastodon messages comprise a larger share of the Fediverse.
- - use the web interface to 
+ - use the web interface to send a specific schema to a target inbox to test how your software handles that schema
 
 ### Features to come
+
+There is a [Github Project](https://github.com/orgs/berkmancenter/projects/12) to track future work on the Fuzzer.
 
 If there's a feature you'd like this to have, please open an issue or a pull request!
  Right now I mostly want to prioritize issues from users, but am also planning to add:

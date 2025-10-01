@@ -190,7 +190,8 @@
           try {
             const softwareSelect = document.getElementById('softwareSelect');
             const selectedSoftware = softwareSelect.value;
-            const response = await fetch(`/random-schema-json?types=Create,Announce&notesOnly=false&software=${selectedSoftware}&rewriteAnnounceToCreate=true`);
+            const rewriteAnnounceToCreate = document.getElementById('rewriteAnnounceToCreate').checked;
+            const response = await fetch(`/random-schema-json?types=Create,Announce&notesOnly=false&software=${selectedSoftware}&rewriteAnnounceToCreate=${rewriteAnnounceToCreate}`);
             const schemaData = await response.json();
             const schemaHash = schemaData.hash;
             const result = await fetch('/post-to-endpoint', {
@@ -231,7 +232,8 @@
         startFirehoseButton.addEventListener('click', function() {
           const delayInput = document.getElementById('firehoseDelay');
           const delay = delayInput ? delayInput.value : 1000; // Default to 1000ms if not found
-          fetch(`/firehose/start?delay=${delay}&rewriteAnnounceToCreate=true`)
+          const rewriteAnnounceToCreate = document.getElementById('rewriteAnnounceToCreate').checked;
+          fetch(`/firehose/start?delay=${delay}&rewriteAnnounceToCreate=${rewriteAnnounceToCreate}`)
             .then(response => response.text())
             .then(data => {
               console.log(data);
@@ -298,6 +300,10 @@
             </select>
           </div>
           <div style="flex: 1; margin-left: 10px;">
+            <label>
+              <input type="checkbox" id="rewriteAnnounceToCreate" checked>
+              Rewrite Announce to Create (recommended)
+            </label>
             <label for="postCount">Number of schemas to POST:</label>
             <input type="number" id="postCount" name="postCount" min="1" value="1" style="width: 100%;">
             <div style="text-align: left;">

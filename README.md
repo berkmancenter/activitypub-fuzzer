@@ -40,13 +40,16 @@ fedify tunnel 3000
 
 - copy `.env.example` to `.env`
 - edit `.env` to set the following variables:
-   - `DEFAULT_TARGET_ENDPOINT`: the URL of an ActivityPub inbox you want the Fuzzer to send activities to, e.g. `https://myserver.example/users/alice/inbox`
-   - `ACCOUNT`: the account name of the main account on the Fuzzer, e.g. `fuzzer`
-   - `DOMAIN`: the domain name of the Fuzzer as exposed by the tunneling service, without `https://`, e.g. `fuzzer.example` (if using a tunneling service like ngrok, this will be something like `abcd1234.ngrok.io`)
-   - `PORT`: the port number to run the Fuzzer on, e.g. `3000`
-   - `ACTOR_DISPLAY_NAME`: the display name of the main account on the Fuzzer, e.g. `Fuzzer`
-   - `ACTOR_DESCRIPTION`: a short description of the main account on the Fuzzer, e.g. `A fuzzer for ActivityPub`, which will appear in the main fuzzer account profile if you fetch it
-   - `ACTOR_AVATAR`: a URL to an image to use as the avatar for the main account on the Fuzzer, e.g. `https://example.com/avatar.png`
+
+| Variable name  | Description | Example value |
+| ------------- | ------------- | ------------- |
+|`DEFAULT_TARGET_ENDPOINT`| the URL of an ActivityPub inbox you want the Fuzzer to send activities to | `https://myserver.example/users/alice/inbox`|
+|`ACCOUNT`| the account name of the main account on the Fuzzer | `fuzzer`|
+|`DOMAIN`| the domain name of the Fuzzer as exposed by the tunneling service, without `https://`| `fuzzer.example` (if using a tunneling service like ngrok, this will be something like `abcd1234.ngrok.io`)|
+|`PORT`| the port number to run the Fuzzer on | `3000`|
+|`ACTOR_DISPLAY_NAME`| the display name of the main account on the Fuzzer | `Fuzzer`|
+|`ACTOR_DESCRIPTION`| a short description of the main account on the Fuzzer, which will appear in the main fuzzer account profile if you fetch it| `A fuzzer for ActivityPub`|
+|`ACTOR_AVATAR`| a URL to an image to use as the avatar for the main account on the Fuzzer| `https://example.com/avatar.png`|
 
 ### Run your reverse proxy and the server
 

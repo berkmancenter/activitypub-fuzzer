@@ -1,7 +1,7 @@
 import crypto from 'crypto'; // Import crypto module
 
-const domain = 'activityfuzz.ngrok.dev'; // Define the domain
-const account = 'fuzz'; // Define the account name
+const domain = process.env.DOMAIN;
+const account = process.env.ACCOUNT;
 
 /**
  * Returns base-64 encoded string signed with user's private key

@@ -1,5 +1,5 @@
 import crypto from 'crypto';
-import { parseJSON, createDereferenceableMockObject } from './utils.js';
+import { parseJSON, createDereferenceableMockObject, uniqueArray } from './utils.js';
 
 // Function to replace each <uri> with a unique GUID-based URL
 function replaceUriWithGuid(schema, guid, domain) {
@@ -83,9 +83,18 @@ export default async function mockAndFormat(schema, notes, software, app, rewrit
   parsedSchema.id = parsedSchema.id.replace(/<uri>/g, () => `https://${domain}/m/${guid}/activity`);
   // replace the `actor` with the url for the actor
   parsedSchema.actor = parsedSchema.actor.replace(/<uri>/g, () => `https://${domain}/u/${account}`);
-  // replace `attributedTo` with the url for a generic actor
-  if (parsedSchema.object.attributedTo) {
+  // replace `attributedTo` with the url for a generic actor if it's a string
+  if (parsedSchema.object.attributedTo && parsedSchema.object.attributedTo.replace) {
     parsedSchema.object.attributedTo = parsedSchema.object.attributedTo.replace(/<uri>/g, () => `https://${domain}/u/${account}`);
+  } else if (parsedSchema.object.attributedTo && Array.isArray(parsedSchema.object.attributedTo)) {
+    parsedSchema.object.attributedTo = uniqueArray(
+      parsedSchema.object.attributedTo.map((attributedTo) => {
+        if (attributedTo.replace) {
+          return attributedTo.replace(/<uri>/g, () => `https://${domain}/u/${account}`);
+        }
+        return attributedTo;
+      }),
+    );
   }
   // replace all href values within the array in parsedSchema.object.tag with a mocked user
   if (parsedSchema.object.tag) {

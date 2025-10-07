@@ -1,5 +1,10 @@
 import crypto from 'crypto';
 
+export function uniqueArray(arr) {
+  const uniqueArr = [...new Set(arr)];
+  return uniqueArr;
+}
+
 export function isValidUrl(string) {
   /* eslint-disable no-new */
   try {

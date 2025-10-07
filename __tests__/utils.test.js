@@ -1,6 +1,12 @@
-import { createDereferenceableMockObject, isValidUrl, parseJSON } from '../utils';
+import { createDereferenceableMockObject, isValidUrl, parseJSON, uniqueArray } from '../utils';
 
 describe('Utility Functions', () => {
+  test('uniqueArray should return an array with unique elements', () => {
+    const arr = [1, 2, 2, 'a', 'a', 4, 5];
+    const uniqueArr = uniqueArray(arr);
+    expect(uniqueArr).toEqual([1, 2, 'a', 4, 5]);
+  });
+
   test('isValidUrl should return true for valid URLs', () => {
     expect(isValidUrl('https://example.com')).toBe(true);
   });

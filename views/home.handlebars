@@ -170,7 +170,7 @@
         const selectedHash = schemaSelect.value;
         const rewriteAnnounceToCreate = document.getElementById('rewriteAnnounceToCreate').checked;
         if (selectedHash) {
-          window.location.href = `./show-schema?hash=${selectedHash}&rewriteAnnounceToCreate=${rewriteAnnounceToCreate}`;
+          window.location.href = `./show-schema?hash=${selectedHash}&rewriteAnnounceToCreate=${rewriteAnnounceToCreate}&htmlDisplay=true`;
         }
       });
 
@@ -355,7 +355,7 @@
         </form>
         <p><strong>Hash:</strong> {{randomSchema.hash}}</p>
         <p><strong>Title:</strong> {{decodeURI randomSchema.notes}}</p>
-        <pre><code class="json">{{{randomSchema.schema}}}</code></pre>
+        <pre><code class="json">{{{randomSchema.htmlFormattedSchema}}}</code></pre>
       </div>
     {{/if}}
   </div>

@@ -286,7 +286,7 @@ app.post('/post-to-endpoint', async function (req, res) {
   }
 
   const guid = await signAndSend(schema);
-  return res.status(200).json({ guid });
+  return res.status(200).redirect(301, `/m/${guid}/activity`);
 });
 
 app.post('/sendFollow', express.urlencoded({ extended: false }), async function (req, res) {
@@ -477,6 +477,7 @@ app.get('/random-schema', async (req, res) => {
 app.get('/show-schema', async (req, res) => {
   const { hash } = req.query;
   const rewriteAnnounceToCreate = req.query.rewriteAnnounceToCreate === 'true';
+  const htmlDisplay = req.query.htmlDisplay === 'true';
   if (!hash) {
     return res.status(400).send('Hash is required.');
   }
@@ -485,16 +486,17 @@ app.get('/show-schema', async (req, res) => {
   return db.get(query, [hash], async (err, row) => {
     if (err) {
       console.error('Error querying database:', err.message);
-      return res.status(500).send('Internal Server Error One');
+      return res.status(500).send('Internal Server Error');
     }
     if (!row) {
       return res.status(404).send('Schema not found.');
     }
 
     // Format the schema as pretty-printed JSON
-    let formattedSchema = await mockAndFormat(row.schema, decodeURIComponent(row.notes), row.software, app, rewriteAnnounceToCreate);
-    formattedSchema = formattedSchema.replace(/</g, '&lt;').replace(/>/g, '&gt;');
-    return res.render('home', { totalSum: 0, targetEndpoint, randomSchema: { ...row, schema: formattedSchema } }); // Pass formattedSchema to the template
+    const formattedSchema = await mockAndFormat(row.schema, decodeURIComponent(row.notes), row.software, app, rewriteAnnounceToCreate);
+    let htmlFormattedSchema = formattedSchema;
+    htmlFormattedSchema = formattedSchema.replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    return res.render('home', { totalSum: 0, targetEndpoint, randomSchema: { ...row, schema: formattedSchema, htmlFormattedSchema } }); // Pass formattedSchema to the template
   });
 });
 

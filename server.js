@@ -453,6 +453,7 @@ app.get('/random-schema-json', async (req, res) => {
   });
 });
 
+// This function is just for rendering on the web frontend and I'll probably get rid of it at some point
 app.get('/random-schema', async (req, res) => {
   const { types, notesOnly } = req.query;
   const rewriteAnnounceToCreate = req.query.rewriteAnnounceToCreate === 'true';
@@ -491,7 +492,8 @@ app.get('/show-schema', async (req, res) => {
     }
 
     // Format the schema as pretty-printed JSON
-    const formattedSchema = await mockAndFormat(row.schema, decodeURIComponent(row.notes), row.software, app, rewriteAnnounceToCreate);
+    let formattedSchema = await mockAndFormat(row.schema, decodeURIComponent(row.notes), row.software, app, rewriteAnnounceToCreate);
+    formattedSchema = formattedSchema.replace(/</g, '&lt;').replace(/>/g, '&gt;');
     return res.render('home', { totalSum: 0, targetEndpoint, randomSchema: { ...row, schema: formattedSchema } }); // Pass formattedSchema to the template
   });
 });

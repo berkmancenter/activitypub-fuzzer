@@ -22,7 +22,7 @@ function replaceStringWithExampleString(schema, string) {
         const subkeys = getDeepKeys(obj[key]);
         keys = keys.concat(
           subkeys.map(function (subkey) {
-            return `${key}.${subkey}`;
+            return `${key}.${subkey.replace(/\./g, 'QQQQ')}`; // use QQQQ as a delimiter that won't appear in a key name
           }),
         );
       }

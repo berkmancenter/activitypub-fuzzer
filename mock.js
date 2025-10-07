@@ -182,11 +182,11 @@ export default async function mockAndFormat(schema, notes, software, app, rewrit
       parsedSchema.object.tag.name = `@someUser@${domain}`;
       parsedSchema.object.tag.href = `https://${domain}/u/someUser`;
     }
+  }
 
-    if (parsedSchema.object.type === 'Article') {
-      parsedSchema.object.content =
-        '<p>This is example article content.</p><p>This is example article content.</p><p>This is example article content.</p><p>This is example article content.</p><p>This is example article content.</p>';
-    }
+  if (parsedSchema.object.type === 'Article') {
+    parsedSchema.object.content =
+      '<p>This is example article content.</p><p>This is example article content.</p><p>This is example article content.</p><p>This is example article content.</p><p>This is example article content.</p>';
   }
 
   // use Array.prototype.some to check to see if any object in the parsedSchema.object.tag array contains a type of "Hashtag"
@@ -256,6 +256,6 @@ export default async function mockAndFormat(schema, notes, software, app, rewrit
   formattedSchema = replaceIntegerWithRandomInteger(formattedSchema); // Replace <integer> with random integer
   formattedSchema = replaceUndefinedWithEmpty(formattedSchema); // Replace <undefined> with empty string
   formattedSchema = replaceNullWithNull(formattedSchema); // Replace <null> with null
-  formattedSchema = JSON.stringify(parseJSON(formattedSchema), null, 2); // .replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  formattedSchema = JSON.stringify(parseJSON(formattedSchema), null, 2);
   return formattedSchema;
 }

@@ -28,8 +28,8 @@ const config = {
 
 const app = express(); // Create an express application
 const port = config.PORT;
-const domain = config.DOMAIN;
-const account = config.ACCOUNT;
+const domain = config.DOMAIN || 'default-domain.com';
+const account = config.ACCOUNT || 'default-account';
 const actorInfo = {
   displayName: config.ACTOR_DISPLAY_NAME || 'Fuzzer', // Define the display name
   description: config.ACTOR_DESCRIPTION || 'An ActivityPub fuzzing tool', // Define the description

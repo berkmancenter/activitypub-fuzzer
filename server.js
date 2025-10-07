@@ -477,7 +477,6 @@ app.get('/random-schema', async (req, res) => {
 app.get('/show-schema', async (req, res) => {
   const { hash } = req.query;
   const rewriteAnnounceToCreate = req.query.rewriteAnnounceToCreate === 'true';
-  const htmlDisplay = req.query.htmlDisplay === 'true';
   if (!hash) {
     return res.status(400).send('Hash is required.');
   }

@@ -16,6 +16,7 @@ dotenv.config({ path: '.env' });
 
 const config = {
   DEFAULT_TARGET_ENDPOINT: process.env.DEFAULT_TARGET_ENDPOINT,
+  DEFAULT_TARGET_USER_ID: process.env.DEFAULT_TARGET_USER_ID,
   DOMAIN: process.env.DOMAIN,
   PORT: process.env.PORT || 3000,
   ACCOUNT: process.env.ACCOUNT,
@@ -291,7 +292,8 @@ app.post('/post-to-endpoint', async function (req, res) {
 
 app.post('/sendFollow', express.urlencoded({ extended: false }), async function (req, res) {
   const url = targetEndpoint;
-  const followMessage = await createFollowMessage(url);
+  const target = config.DEFAULT_TARGET_USER_ID;
+  const followMessage = await createFollowMessage(target);
   console.log('sending follow to inbox:', url);
   console.log('follow message:', followMessage);
   signAndSend(JSON.stringify(followMessage), url);

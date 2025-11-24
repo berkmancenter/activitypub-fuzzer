@@ -1,4 +1,7 @@
 import crypto from 'crypto'; // Import crypto module
+import dotenv from 'dotenv';
+
+dotenv.config({ path: '.env' });
 
 const domain = process.env.DOMAIN;
 const account = process.env.ACCOUNT;
@@ -73,7 +76,7 @@ export function getSignatureParams(body, method, url) {
  */
 export function getSignatureHeader(signature, signatureKeys) {
   return [
-    `keyId="https://${domain}/u/${account}"`,
+    `keyId="https://${domain}/u/${account}#main-key"`,
     `algorithm="rsa-sha256"`,
     `headers="${signatureKeys.join(' ')}"`,
     `signature="${signature}"`,

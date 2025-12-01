@@ -34,6 +34,30 @@
       background-color: #f4f4f9;
       color: #333;
     }
+    .log-entry {
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      padding: 15px;
+      margin-bottom: 15px;
+      background-color: #fff;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+    .log-entry h3 {
+      margin: 0 0 10px;
+      font-size: 1.2em;
+      color: #4a90e2;
+    }
+    .log-entry p {
+      margin: 5px 0;
+      color: #555;
+    }
+    .log-entry a {
+      color: #4a90e2;
+      text-decoration: none;
+    }
+    .log-entry a:hover {
+      text-decoration: underline;
+    }
     .flame-effect {
       animation: flame 1s infinite alternate;
     }
@@ -306,7 +330,14 @@
       const logDiv = document.createElement('div');
 
       logDiv.className = 'log-entry';
-      logDiv.innerHTML = `<ul><li>${decodeURIComponent(notes)} <a href="${redirectPath}">inspect &rarr;</a></li><ul><li><a href="https://observatory.cyber.harvard.edu/?specificHash=${hash}">FSO link</a></li><li>software: ${software}</li><li>time: ${time}</li><li>Content preview: <code>${content}</code></ul></ul>`;
+      logDiv.innerHTML = `
+        <h3>${decodeURIComponent(notes)}</h3>
+        <p><strong>Software:</strong> ${software}</p>
+        <p><strong>Time:</strong> ${time}</p>
+        <p><strong>Content Preview:</strong></p>
+        <pre><code>${content}</code></pre>
+        <p><a href="${redirectPath}">Inspect &rarr;</a> | <a href="https://observatory.cyber.harvard.edu/?specificHash=${hash}">FSO link</a></p>
+      `;
       return logDiv;
     }
 

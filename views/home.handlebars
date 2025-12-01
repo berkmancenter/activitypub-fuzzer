@@ -301,6 +301,13 @@
       }
     });
 
+    function makeLogDiv(data) {
+      const logDiv = document.createElement('div');
+      logDiv.className = 'log-entry';
+      logDiv.textContent = JSON.stringify(data, null, 2);
+      return logDiv;
+    }
+
     const es = new EventSource('/firehose/stream');
     es.addEventListener('schemaPosted', e => {
       console.log('~~~~~heyyyyyyyy', event.data);

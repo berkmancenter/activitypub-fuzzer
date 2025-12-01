@@ -323,11 +323,14 @@
             .catch(error => console.error('Error stopping firehose:', error));
         });
       }
+
       const clearLogButton = document.getElementById('clearLogButton');
       clearLogButton.addEventListener('click', () => {
         const logDiv = document.getElementById('log');
         logDiv.innerHTML = ''; // Clear the log contents
       });
+
+    });
 
     function makeLogDiv(data) {
       const { hash, software, time, notes, redirectPath, content } = data;

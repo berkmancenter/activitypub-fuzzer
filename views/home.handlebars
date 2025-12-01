@@ -300,6 +300,11 @@
         });
       }
     });
+
+    const es = new EventSource('/firehose/stream');
+    es.addEventListener('schemaPosted', e => {
+      console.log('~~~~~heyyyyyyyy', event.data);
+    });
   </script>
 </head>
 <body>
@@ -405,6 +410,6 @@
   <div class="tab-content">
     <div class="container">
       <h2>Log</h2>
-      <p>This is the log tab. Content will be added here later.</p>
+      <div id="log"></div>
     </div>
   </div>

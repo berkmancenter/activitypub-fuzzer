@@ -12,6 +12,9 @@ import mockAndFormat from './mock.js';
 import wellKnownRoute from './routes/well-known.js';
 import nodeinfoRoute from './routes/nodeinfo.js';
 
+import SSE from 'express-sse';
+const sse = new SSE();
+
 dotenv.config({ path: '.env' });
 
 const config = {
@@ -316,6 +319,8 @@ app.get('/firehose/stop', (req, res) => {
   }
 });
 
+app.get('/firehose/stream', sse.init);
+
 app.get('/firehose/start', (req, res) => {
   function randomSchemaDistributed() {
     return new Promise((resolve, reject) => {
@@ -340,7 +345,7 @@ app.get('/firehose/start', (req, res) => {
       });
     });
   }
-
+  
   const delay = parseInt(req.query.delay, 10);
   if (Number.isNaN(delay) || delay <= 0) {
     return res.status(400).send('Invalid delay parameter. It must be a positive integer.');
@@ -369,6 +374,7 @@ app.get('/firehose/start', (req, res) => {
         console.error('Failed to post schema:', response.statusText);
       } else {
         console.log('Schema posted successfully');
+        sse.send({ hash: row.hash, software: row.software }, 'schemaPosted');
       }
     } catch (error) {
       console.error('Error fetching random schema:', error);

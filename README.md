@@ -48,6 +48,7 @@ fedify tunnel 3000
 | Variable name  | Description | Example value |
 | ------------- | ------------- | ------------- |
 |`DEFAULT_TARGET_ENDPOINT`| the URL of an ActivityPub inbox you want the Fuzzer to send activities to | `https://myserver.example/users/alice/inbox`|
+|`DEFAULT_TARGET_USER_ID`| the ID of an ActivityPub account you want the Fuzzer to interact with in case of a follow | `https://myserver.example/users/alice/`|
 |`ACCOUNT`| the account name of the main account on the Fuzzer | `fuzzer`|
 |`DOMAIN`| the domain name of the Fuzzer as exposed by the tunneling service, without `https://`| `fuzzer.example` (if using a tunneling service like ngrok, this will be something like `abcd1234.ngrok.io`)|
 |`PORT`| the port number to run the Fuzzer on | `3000`|

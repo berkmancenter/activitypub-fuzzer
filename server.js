@@ -16,6 +16,7 @@ dotenv.config({ path: '.env' });
 
 const config = {
   DEFAULT_TARGET_ENDPOINT: process.env.DEFAULT_TARGET_ENDPOINT,
+  DEFAULT_TARGET_USER_ID: process.env.DEFAULT_TARGET_USER_ID,
   DOMAIN: process.env.DOMAIN,
   PORT: process.env.PORT || 3000,
   ACCOUNT: process.env.ACCOUNT,
@@ -44,9 +45,13 @@ Handlebars.registerHelper('decodeURI', function (uri) {
 });
 app.engine('handlebars', engine());
 app.set('view engine', 'handlebars');
-app.use(express.json());
 app.use('/images', express.static('public/images'));
-app.use(express.json({ type: 'application/ld+json; profile="https://www.w3.org/ns/activitystreams"' }));
+app.use(express.json({
+  type: [ 'application/ld+json; profile="https://www.w3.org/ns/activitystreams"',
+          'application/activity+json',
+          'application/activity+json; charset=utf-8'
+        ]
+}));
 app.use(express.urlencoded({ extended: true })); // Middleware to parse URL-encoded bodies
 
 let targetEndpoint = config.DEFAULT_TARGET_ENDPOINT; // Variable to store the target endpoint
@@ -123,7 +128,7 @@ function createOrGetAccount(accountName) {
 }
 
 async function getInboxFromActorProfile(profileUrl) {
-  const response = await signedGetJSON(db, `${profileUrl}.json`);
+  const response = await signedGetJSON(fuzzdb, `${profileUrl}.json`);
   const data = await response.json();
 
   if (data?.inbox) {
@@ -181,7 +186,7 @@ async function sendAcceptMessage(thebody) {
   const inbox = await getInboxFromActorProfile(message.object.actor);
 
   console.log('sending accept message to inbox:', inbox);
-  signAndSend(message, inbox);
+  signAndSend(JSON.stringify(message), inbox);
 }
 
 async function handleFollowRequest(req) {
@@ -292,7 +297,8 @@ app.post('/post-to-endpoint', async function (req, res) {
 
 app.post('/sendFollow', express.urlencoded({ extended: false }), async function (req, res) {
   const url = targetEndpoint;
-  const followMessage = await createFollowMessage(url);
+  const target = config.DEFAULT_TARGET_USER_ID;
+  const followMessage = await createFollowMessage(target);
   console.log('sending follow to inbox:', url);
   console.log('follow message:', followMessage);
   signAndSend(JSON.stringify(followMessage), url);

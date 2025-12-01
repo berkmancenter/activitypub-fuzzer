@@ -299,6 +299,20 @@ app.post('/post-to-endpoint', async function (req, res) {
   return res.status(200).redirect(301, `/m/${guid}/activity`);
 });
 
+app.post('/post-to-endpoint-firehose', async function (req, res) {
+  if (!targetEndpoint) {
+    return res.status(400).send('Target endpoint is not set.');
+  }
+  const { schema } = req.body;
+
+  if (!schema) {
+    return res.status(400).send('No schema to post.');
+  }
+
+  const guid = await signAndSend(schema);
+  return res.json({ redirectPath: `/m/${guid}/activity`, content: JSON.parse(schema)?.object?.content || '' });
+});
+
 app.post('/sendFollow', express.urlencoded({ extended: false }), async function (req, res) {
   const url = targetEndpoint;
   const target = config.DEFAULT_TARGET_USER_ID;
@@ -362,7 +376,7 @@ app.get('/firehose/start', (req, res) => {
       const row = await randomSchemaDistributed();
       console.log('Random schema selected:', row.hash, row.total, row.software);
       const formattedSchema = await mockAndFormat(row.schema, decodeURIComponent(row.notes), row.software, app, rewriteAnnounceToCreate);
-      const response = await fetch(`http://localhost:${port}/post-to-endpoint`, {
+      const response = await fetch(`http://localhost:${port}/post-to-endpoint-firehose`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -373,8 +387,10 @@ app.get('/firehose/start', (req, res) => {
       if (!response.ok) {
         console.error('Failed to post schema:', response.statusText);
       } else {
+        const data = await response.json();
         console.log('Schema posted successfully');
-        sse.send({ hash: row.hash, software: row.software }, 'schemaPosted');
+        const { redirectPath, content } = data;
+        sse.send({ hash: row.hash, software: row.software, time: new Date().toISOString(), notes: row.notes, redirectPath, content }, 'schemaPosted');
       }
     } catch (error) {
       console.error('Error fetching random schema:', error);

@@ -302,15 +302,18 @@
     });
 
     function makeLogDiv(data) {
+      const { hash, software, time, notes, redirectPath, content } = data;
       const logDiv = document.createElement('div');
+
       logDiv.className = 'log-entry';
-      logDiv.textContent = JSON.stringify(data, null, 2);
+      logDiv.innerHTML = `<ul><li>${decodeURIComponent(notes)} <a href="${redirectPath}">inspect &rarr;</a></li><ul><li><a href="https://observatory.cyber.harvard.edu/?specificHash=${hash}">FSO link</a></li><li>software: ${software}</li><li>time: ${time}</li><li>Content preview: <code>${content}</code></ul></ul>`;
       return logDiv;
     }
 
     const es = new EventSource('/firehose/stream');
     es.addEventListener('schemaPosted', e => {
-      console.log('~~~~~heyyyyyyyy', event.data);
+      const $log = document.getElementById('log');
+      $log.append(makeLogDiv(JSON.parse(event.data)));
     });
   </script>
 </head>

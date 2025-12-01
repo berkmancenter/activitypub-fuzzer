@@ -323,7 +323,11 @@
             .catch(error => console.error('Error stopping firehose:', error));
         });
       }
-    });
+      const clearLogButton = document.getElementById('clearLogButton');
+      clearLogButton.addEventListener('click', () => {
+        const logDiv = document.getElementById('log');
+        logDiv.innerHTML = ''; // Clear the log contents
+      });
 
     function makeLogDiv(data) {
       const { hash, software, time, notes, redirectPath, content } = data;
@@ -451,6 +455,7 @@
   <div class="tab-content">
     <div class="container">
       <h2>Log</h2>
+      <button id="clearLogButton" style="margin-bottom: 10px;">Clear Log</button>
       <div id="log"></div>
     </div>
   </div>

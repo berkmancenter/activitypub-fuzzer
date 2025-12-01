@@ -155,7 +155,7 @@ async function signAndSend(message, target = targetEndpoint) {
       }
     });
 
-    console.log('Message sent:' , strigifiedJSON);
+    console.log('Message sent:', strigifiedJSON);
     console.log(`Sent message to an inbox at ${target}!`);
     console.log('Message id:', parsedJSON.id);
     console.log('Response Status Code:', response.status);

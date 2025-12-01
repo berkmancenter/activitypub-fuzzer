@@ -213,7 +213,7 @@
             } else {
               title = decodeURIComponent(schemaData.notes);
             }
-            schemasPostedDiv.innerHTML += `<li><a href="/m/${guid}" target="_">${title}</a> <a href="https://observatory.cyber.harvard.edu/?hashLeft=${schemaHash}&hashRight=${schemaHash}">(FSO link)</a></li>`;
+            schemasPostedDiv.innerHTML += `<li><a href="/m/${guid}" target="_">${title}</a> <a href="https://observatory.cyber.harvard.edu/?specificHash=${schemaHash}">(FSO link)</a></li>`;
           } catch (error) {
             console.error('Error posting random schema:', error);
           }

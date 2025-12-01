@@ -3,6 +3,29 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>ActivityPub Fuzzer</title>
   <style>
+    .tabs {
+      display: flex;
+      cursor: pointer;
+      margin-bottom: 20px;
+    }
+    .tab {
+      flex: 1;
+      padding: 10px;
+      text-align: center;
+      background-color: #e0e0e0;
+      border-radius: 8px 8px 0 0;
+      margin-right: 2px;
+    }
+    .tab.active {
+      background-color: #fff;
+      border-bottom: 2px solid #fff;
+    }
+    .tab-content {
+      display: none;
+    }
+    .tab-content.active {
+      display: block;
+    }
     body {
       font-family: Arial, sans-serif;
       margin: 0;
@@ -97,6 +120,18 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.5.1/highlight.min.js"></script>
   <script>
     document.addEventListener('DOMContentLoaded', () => {
+      const tabs = document.querySelectorAll('.tab');
+      const tabContents = document.querySelectorAll('.tab-content');
+
+      tabs.forEach((tab, index) => {
+        tab.addEventListener('click', () => {
+          tabs.forEach(t => t.classList.remove('active'));
+          tabContents.forEach(tc => tc.classList.remove('active'));
+
+          tab.classList.add('active');
+          tabContents[index].classList.add('active');
+        });
+      });
       hljs.highlightAll();
 
       // Function to build query string
@@ -268,7 +303,12 @@
 </head>
 <body>
   <h1>ActivityPub Fuzzer</h1>
-  <div class="container">
+  <div class="tabs">
+    <div class="tab active">Fuzzer</div>
+    <div class="tab">Log</div>
+  </div>
+  <div class="tab-content active">
+    <div class="container">
     <p>This is a page where you can configure an ActivityPub fuzzer. This is an <a href="https://asml.cyber.harvard.edu">Applied Social Media Lab</a> project, featuring data from the <a href="https://observatory.cyber.harvard.edu">Fediverse Schema Observatory</a>.</p>
     <label>
       <input type="checkbox" id="rewriteAnnounceToCreate" checked>
@@ -359,4 +399,11 @@
       </div>
     {{/if}}
   </div>
-</body>
+    </div>
+  </div>
+  <div class="tab-content">
+    <div class="container">
+      <h2>Log</h2>
+      <p>This is the log tab. Content will be added here later.</p>
+    </div>
+  </div>

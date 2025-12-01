@@ -143,6 +143,8 @@
   </style>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.5.1/styles/default.min.css">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.5.1/highlight.min.js"></script>
+   <script type="module" src="https://unpkg.com/@github/relative-time-element@latest/dist/bundle.js"></script>
+
   <script>
     document.addEventListener('DOMContentLoaded', () => {
       const tabs = document.querySelectorAll('.tab');
@@ -340,7 +342,7 @@
       logDiv.innerHTML = `
         <h3>${decodeURIComponent(notes)}</h3>
         <p><strong>Software:</strong> ${software}</p>
-        <p><strong>Time:</strong> ${time}</p>
+        <p><strong>Time:</strong><relative-time datetime="${time}" format="relative" formatStyle="narrow"> ${time}</relative-time></p>
         <p><strong>Content Preview:</strong></p>
         <pre><code>${content}</code></pre>
         <p><a href="${redirectPath}">Inspect &rarr;</a> | <a href="https://observatory.cyber.harvard.edu/?specificHash=${hash}">FSO link</a></p>
@@ -351,7 +353,7 @@
     const es = new EventSource('/firehose/stream');
     es.addEventListener('schemaPosted', e => {
       const $log = document.getElementById('log');
-      $log.append(makeLogDiv(JSON.parse(event.data)));
+      $log.prepend(makeLogDiv(JSON.parse(event.data)));
     });
   </script>
 </head>

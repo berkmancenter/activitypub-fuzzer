@@ -49,7 +49,8 @@ app.use('/images', express.static('public/images'));
 app.use(express.json({
   type: [ 'application/ld+json; profile="https://www.w3.org/ns/activitystreams"',
           'application/activity+json',
-          'application/activity+json; charset=utf-8'
+          'application/activity+json; charset=utf-8',
+          'application/json'
         ]
 }));
 app.use(express.urlencoded({ extended: true })); // Middleware to parse URL-encoded bodies

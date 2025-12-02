@@ -71,6 +71,9 @@
     .log-entry a:hover {
       text-decoration: underline;
     }
+    .read {
+      background-color: red;
+    }
     .flame-effect {
       animation: flame 1s infinite alternate;
     }
@@ -171,6 +174,14 @@
           tab.classList.add('active');
           tabContents[index].classList.add('active');
         });
+      });
+
+      markAllAsReadButton.addEventListener('click', () => {
+        const logEntries = document.querySelectorAll('.log-entry');
+        logEntries.forEach(entry => {
+          entry.classList.add('read');
+        });
+        logNotificationDot.style.display = 'none';
       });
       hljs.highlightAll();
 

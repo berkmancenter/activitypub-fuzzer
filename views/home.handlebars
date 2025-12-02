@@ -72,7 +72,7 @@
       text-decoration: underline;
     }
     .read {
-      background-color: red;
+      background-color: #f0f0f0;
     }
     .flame-effect {
       animation: flame 1s infinite alternate;
@@ -176,13 +176,6 @@
         });
       });
 
-      markAllAsReadButton.addEventListener('click', () => {
-        const logEntries = document.querySelectorAll('.log-entry');
-        logEntries.forEach(entry => {
-          entry.classList.add('read');
-        });
-        logNotificationDot.style.display = 'none';
-      });
       hljs.highlightAll();
 
       // Function to build query string
@@ -361,6 +354,14 @@
       });
 
       markAllAsReadButton.addEventListener('click', () => {
+        logNotificationDot.style.display = 'none';
+      });
+
+      markAllAsReadButton.addEventListener('click', () => {
+        const logEntries = document.querySelectorAll('.log-entry');
+        logEntries.forEach(entry => {
+          entry.classList.add('read');
+        });
         logNotificationDot.style.display = 'none';
       });
 

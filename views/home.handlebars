@@ -21,6 +21,19 @@
       background-color: #fff;
       border-bottom: 2px solid #fff;
     }
+    .tab {
+      position: relative;
+    }
+    .notification-dot {
+      position: absolute;
+      top: 5px;
+      right: 10px;
+      width: 10px;
+      height: 10px;
+      background-color: red;
+      border-radius: 50%;
+      display: none;
+    }
     .tab-content {
       display: none;
     }
@@ -325,7 +338,30 @@
         });
       }
 
+      const logNotificationDot = document.getElementById('logNotificationDot');
       const clearLogButton = document.getElementById('clearLogButton');
+      const markAllAsReadButton = document.getElementById('markAllAsReadButton');
+
+      function updateNotificationDot() {
+        const logDiv = document.getElementById('log');
+        if (logDiv.children.length > 0) {
+          logNotificationDot.style.display = 'block';
+        } else {
+          logNotificationDot.style.display = 'none';
+        }
+      }
+
+      clearLogButton.addEventListener('click', () => {
+        const logDiv = document.getElementById('log');
+        logDiv.innerHTML = ''; // Clear the log contents
+        updateNotificationDot();
+      });
+
+      markAllAsReadButton.addEventListener('click', () => {
+        logNotificationDot.style.display = 'none';
+      });
+
+      updateNotificationDot();
       clearLogButton.addEventListener('click', () => {
         const logDiv = document.getElementById('log');
         logDiv.innerHTML = ''; // Clear the log contents
@@ -370,7 +406,7 @@
   <h1>ActivityPub Fuzzer</h1>
   <div class="tabs">
     <div class="tab active">Fuzzer</div>
-    <div class="tab">Log</div>
+    <div class="tab">Log<span class="notification-dot" id="logNotificationDot"></span></div>
   </div>
   <div class="tab-content active">
     <div class="container">
@@ -470,6 +506,7 @@
     <div class="container">
       <h2>Log</h2>
       <button id="clearLogButton" style="margin-bottom: 10px;">Clear Log</button>
+      <button id="markAllAsReadButton" style="margin-bottom: 10px;">Mark All as Read</button>
       <div id="log"></div>
     </div>
   </div>

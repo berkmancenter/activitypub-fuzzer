@@ -288,6 +288,7 @@
               notes: schemaData.notes,
               schema: schemaData.schema,
             }));
+            updateNotificationDot();
           } catch (error) {
             console.error('Error posting random schema:', error);
           }
@@ -342,15 +343,6 @@
       const clearLogButton = document.getElementById('clearLogButton');
       const markAllAsReadButton = document.getElementById('markAllAsReadButton');
 
-      function updateNotificationDot() {
-        const logDiv = document.getElementById('log');
-        if (logDiv.children.length > 0) {
-          logNotificationDot.style.display = 'block';
-        } else {
-          logNotificationDot.style.display = 'none';
-        }
-      }
-
       clearLogButton.addEventListener('click', () => {
         const logDiv = document.getElementById('log');
         logDiv.innerHTML = ''; // Clear the log contents
@@ -361,7 +353,6 @@
         logNotificationDot.style.display = 'none';
       });
 
-      updateNotificationDot();
       clearLogButton.addEventListener('click', () => {
         const logDiv = document.getElementById('log');
         logDiv.innerHTML = ''; // Clear the log contents
@@ -399,7 +390,20 @@
     es.addEventListener('schemaPosted', e => {
       const $log = document.getElementById('log');
       $log.prepend(makeLogDiv(JSON.parse(e.data)));
+      updateNotificationDot();
     });
+
+    function updateNotificationDot() {
+      console.log('UND');
+      const logDiv = document.getElementById('log');
+      if (logDiv.children.length > 0) {
+        console.log('show')
+        logNotificationDot.style.display = 'block';
+      } else {
+        console.log('hide')
+        logNotificationDot.style.display = 'none';
+      }
+    }
   </script>
 </head>
 <body>

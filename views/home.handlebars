@@ -249,6 +249,7 @@
           return;
         }
 
+        const $log = document.getElementById('log');
         for (let i = 0; i < postCount; i++) {
           try {
             const softwareSelect = document.getElementById('softwareSelect');
@@ -257,7 +258,7 @@
             const response = await fetch(`/random-schema-json?types=Create,Announce&notesOnly=false&software=${selectedSoftware}&rewriteAnnounceToCreate=${rewriteAnnounceToCreate}`);
             const schemaData = await response.json();
             const schemaHash = schemaData.hash;
-            const result = await fetch('/post-to-endpoint', {
+            const result = await fetch('/post-to-endpoint-firehose', {
               method: 'POST',
               headers: {
                 'Content-Type': 'application/json'
@@ -265,17 +266,15 @@
               body: JSON.stringify({ schema: schemaData.schema })
             });
             const postedMessage = await result.json();
-            const guid = postedMessage.guid;
-            const parsedJSON = JSON.parse(schemaData.schema);
-            const schemaType = parsedJSON.type;
-            const schemaObjectType = parsedJSON.object && parsedJSON.object.type;
-            let title;
-            if (decodeURIComponent(schemaData.notes) === 'null') {
-              title = `${schemaData.software} ${schemaType}(${schemaObjectType})`;
-            } else {
-              title = decodeURIComponent(schemaData.notes);
-            }
-            schemasPostedDiv.innerHTML += `<li><a href="/m/${guid}" target="_">${title}</a> <a href="https://observatory.cyber.harvard.edu/?specificHash=${schemaHash}">(FSO link)</a></li>`;
+            $log.prepend(makeLogDiv({
+              content: postedMessage.content,
+              redirectPath: postedMessage.redirectPath,
+              hash: schemaHash,
+              time: new Date().toISOString(),
+              software: selectedSoftware,
+              notes: schemaData.notes,
+              schema: schemaData.schema,
+            }));
           } catch (error) {
             console.error('Error posting random schema:', error);
           }
@@ -335,17 +334,27 @@
     });
 
     function makeLogDiv(data) {
-      const { hash, software, time, notes, redirectPath, content } = data;
+      const { hash, software, time, notes, redirectPath, content, schema } = data;
       const logDiv = document.createElement('div');
+
+      const parsedJSON = JSON.parse(schema);
+      const schemaType = parsedJSON.type;
+      const schemaObjectType = parsedJSON.object && parsedJSON.object.type;
+      let title;
+      if (decodeURIComponent(notes) === 'null') {
+        title = `${software} ${schemaType}(${schemaObjectType})`;
+      } else {
+        title = decodeURIComponent(notes);
+      }
 
       logDiv.className = 'log-entry';
       logDiv.innerHTML = `
-        <h3>${decodeURIComponent(notes)}</h3>
+        <h3>${title}</h3>
         <p><strong>Software:</strong> ${software}</p>
         <p><strong>Time:</strong><relative-time datetime="${time}" format="relative" formatStyle="narrow"> ${time}</relative-time></p>
         <p><strong>Content Preview:</strong></p>
         <pre><code>${content}</code></pre>
-        <p><a href="${redirectPath}">Inspect &rarr;</a> | <a href="https://observatory.cyber.harvard.edu/?specificHash=${hash}">FSO link</a></p>
+        <p><a href="${redirectPath}" target="_blank">Inspect &rarr;</a> | <a href="https://observatory.cyber.harvard.edu/?specificHash=${hash}" target="_blank">FSO link</a></p>
       `;
       return logDiv;
     }
@@ -353,7 +362,7 @@
     const es = new EventSource('/firehose/stream');
     es.addEventListener('schemaPosted', e => {
       const $log = document.getElementById('log');
-      $log.prepend(makeLogDiv(JSON.parse(event.data)));
+      $log.prepend(makeLogDiv(JSON.parse(e.data)));
     });
   </script>
 </head>

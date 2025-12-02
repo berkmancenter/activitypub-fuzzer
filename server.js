@@ -390,7 +390,7 @@ app.get('/firehose/start', (req, res) => {
         const data = await response.json();
         console.log('Schema posted successfully');
         const { redirectPath, content } = data;
-        sse.send({ hash: row.hash, software: row.software, time: new Date().toISOString(), notes: row.notes, redirectPath, content }, 'schemaPosted');
+        sse.send({ hash: row.hash, software: row.software, time: new Date().toISOString(), notes: row.notes, redirectPath, content, schema: row.schema }, 'schemaPosted');
       }
     } catch (error) {
       console.error('Error fetching random schema:', error);
